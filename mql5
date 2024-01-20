@@ -1,0 +1,138 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                            Zeus Indicator MT5    |
+//|                                         https://www.forexroboteasy.com  |
+//|                                         Developed by Forex Robot Easy Team    |
+//+------------------------------------------------------------------+
+
+// Define input parameters
+input double Parameter1 = 0.5;
+input double Parameter2 = 0.3;
+
+// Define global variables
+double signal;
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   //--- indicator buffers mapping
+   IndicatorBuffers(1);
+   
+   //--- set buffer
+   SetIndexBuffer(0, signal);
+   
+   //--- set indicator line
+   SetIndexStyle(0, DRAW_LINE, STYLE_SOLID, 2);
+   
+   //--- set indicator label
+   SetIndexLabel(0, 'Zeus Indicator');
+   
+   //--- set indicator short name
+   IndicatorShortName('Zeus');
+
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator deinitialization function                       |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+   //--- do nothing
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+   //--- check for bars count
+   if(rates_total < 1)
+      return(0);
+   
+   //--- calculate signals
+   for(int i = prev_calculated; i < rates_total; i++)
+   {
+      signal[i] = CalculateSignal(open[i], close[i]);
+   }
+
+   return(rates_total);
+}
+
+//+------------------------------------------------------------------+
+//| Calculate signal                                                 |
+//+------------------------------------------------------------------+
+double CalculateSignal(const double open_price, const double close_price)
+{
+   double signal_value = 0.0;
+
+   //--- perform market analysis and generate signal
+   if(close_price > open_price)
+   {
+      if(open_price > Parameter1 && close_price > Parameter2)
+         signal_value = 1.0; // Bullish signal
+      else
+         signal_value = 0.0; // No signal
+   }
+   else if(close_price < open_price)
+   {
+      if(open_price < Parameter1 && close_price < Parameter2)
+         signal_value = -1.0; // Bearish signal
+      else
+         signal_value = 0.0; // No signal
+   }
+   
+   return(signal_value);
+}
+
+//+------------------------------------------------------------------+
+//| Custom function to make informed decisions based on strategies    |
+//+------------------------------------------------------------------+
+void MakeInformedDecision()
+{
+   //--- perform strategy analysis and make decision
+   if(signal > 0)
+   {
+      // Execute buy trade
+      Print('Buy trade executed');
+   }
+   else if(signal < 0)
+   {
+      // Execute sell trade
+      Print('Sell trade executed');
+   }
+   else
+   {
+      // No trade executed
+      Print('No trade executed');
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Custom function to deliver real-time alerts                       |
+//+------------------------------------------------------------------+
+void RealTimeAlert()
+{
+   //--- check for trading opportunities
+   if(signal != 0)
+   {
+      // Send alert notification
+      Alert('Trading opportunity detected');
+   }
+   else
+   {
+      // No trading opportunities
+      Alert('No trading opportunities');
+   }
+}
